@@ -19,47 +19,40 @@
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    h1 {
-        text-align: center;
-    }
     .form-group {
         margin-bottom: 20px;
     }
-    .form-group label {
+    label {
         display: block;
         font-weight: bold;
-        margin-bottom: 5px;
     }
-    .form-group input[type="text"],
-    .form-group select {
+    input[type="text"],
+    select {
         width: 100%;
         padding: 10px;
+        font-size: 16px;
         border: 1px solid #ccc;
-        border-radius: 5px;
+        border-radius: 4px;
+        box-sizing: border-box;
     }
-    .form-group select {
-        cursor: pointer;
-    }
-    .btn-submit {
-        display: block;
-        width: 100%;
-        padding: 10px;
-        margin-top: 20px;
-        background-color: #007bff;
+    input[type="submit"] {
+        background-color: #4caf50;
         color: #fff;
         border: none;
-        border-radius: 5px;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 4px;
         cursor: pointer;
     }
-    .btn-submit:hover {
-        background-color: #0056b3;
+    input[type="submit"]:hover {
+        background-color: #45a049;
     }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Job Application Form</h1>
+    <h2>Job Application Form</h2>
     <form id="jobApplicationForm">
         <div class="form-group">
             <label for="fullName">Full Name:</label>
@@ -73,61 +66,56 @@
             <label for="jobTitle">Job Title:</label>
             <select id="jobTitle" name="jobTitle" required>
                 <option value="">Select Job Title</option>
-                <option value="WebDeveloper">Web Developer</option>
-                <option value="GameDeveloper">Game Developer</option>
-                <option value="GeneralManager">General Manager</option>
-                <option value="Graphic Designer">Graphic Designer</option>
-                <option value="Project Manager">Project Manager</option>
+                <option value="job1">Job Title 1</option>
+                <option value="job2">Job Title 2</option>
+                <option value="job3">Job Title 3</option>
+                <option value="job4">Job Title 4</option>
+                <option value="job5">Job Title 5</option>
             </select>
         </div>
-        <button type="submit" class="btn-submit">Submit</button>
+        <input type="submit" value="Submit">
     </form>
 </div>
 
 <script>
-   fetchData = async (url, data) => {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+    document.getElementById("jobApplicationForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the form from submitting
+        
+        // Get form data
+        var fullName = document.getElementById("fullName").value;
+        var email = document.getElementById("email").value;
+        var jobTitle = document.getElementById("jobTitle").value;
+        
+        // Create notification object
+        var notification = {
+            fullName: fullName,
+            email: email,
+            jobTitle: jobTitle
+        };
 
-        if (!response.ok) {
-            throw new Error('Failed to submit application.');
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Error:', error.message);
-        throw error;
-    }
-};
-
-document.getElementById('jobApplicationForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    const formData = new FormData(this);
-    const requestData = {};
-    
-    formData.forEach(function(value, key) {
-        requestData[key] = value;
+        // Call the notification function
+        notify(notification);
     });
 
-    const message = `JOB_APP ${encodeURIComponent(requestData.fullName)} ${encodeURIComponent(requestData.email)} ${encodeURIComponent(requestData.jobTitle)}`;
-    const url = `https://ntfy.sh/codetestgroup/publish?message=${message}&priority=high&tags=warning`;
-
-    try {
-        await fetchData(url, requestData);
-        alert('Application submitted successfully!');
-        document.getElementById('jobApplicationForm').reset();
-    } catch (error) {
-        alert('Failed to submit application. Please try again later.');
+    // Notification function
+    function notify(data) {
+        // Construct the URL for the fetch request
+        var url = 'https://ntfy.sh/codetestgroup/publish?message=' + encodeURIComponent(JSON.stringify(data)) + '&priority=high&tags=warning';
+        
+        // Send the notification
+        fetch(url)
+            .then(function(response) {
+                if (response.ok) {
+                    alert("Notification sent successfully!");
+                } else {
+                    alert("Failed to send notification. Please try again later.");
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert("An error occurred while sending the notification.");
+            });
     }
-});
-
 </script>
 
 </body>
