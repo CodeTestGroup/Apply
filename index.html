@@ -117,7 +117,7 @@ document.getElementById('jobApplicationForm').addEventListener('submit', async f
     });
 
     const message = `JOB_APP ${encodeURIComponent(requestData.fullName)} ${encodeURIComponent(requestData.email)} ${encodeURIComponent(requestData.jobTitle)}`;
-    const url = `https://ntfy.sh/codetestgroup/publish?message=${message}&priority=high&tags=warning`;
+    const url = `https://ntfy.sh/codetestgroup?publish?message=${message}&priority=high&tags=warning`;
 
     try {
         await fetchData(url, requestData);
