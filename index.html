@@ -85,33 +85,49 @@
 </div>
 
 <script>
-    document.getElementById('jobApplicationForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        var formData = new FormData(this);
-        var requestData = {};
-        formData.forEach(function(value, key) {
-            requestData[key] = value;
+   fetchData = async (url, data) => {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
-       fetch('https://ntfy.sh/codetestgroup/publish?message=JOB_APP+' + encodeURIComponent(requestData.fullName) + '+' + encodeURIComponent(requestData.email) + '+' + encodeURIComponent(requestData.jobTitle) + '&priority=high&tags=warning', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    }
-})
 
-        .then(function(response) {
-            if (response.ok) {
-                alert('Application submitted successfully!');
-                document.getElementById('jobApplicationForm').reset();
-            } else {
-                alert('Failed to submit application. Please try again later.');
-            }
-        })
-        .catch(function(error) {
-            console.error('Error:', error);
-            alert('Failed to submit application. Please try again later.');
-        });
+        if (!response.ok) {
+            throw new Error('Failed to submit application.');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error.message);
+        throw error;
+    }
+};
+
+document.getElementById('jobApplicationForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const requestData = {};
+    
+    formData.forEach(function(value, key) {
+        requestData[key] = value;
     });
+
+    const message = `JOB_APP ${encodeURIComponent(requestData.fullName)} ${encodeURIComponent(requestData.email)} ${encodeURIComponent(requestData.jobTitle)}`;
+    const url = `https://ntfy.sh/codetestgroup/publish?message=${message}&priority=high&tags=warning`;
+
+    try {
+        await fetchData(url, requestData);
+        alert('Application submitted successfully!');
+        document.getElementById('jobApplicationForm').reset();
+    } catch (error) {
+        alert('Failed to submit application. Please try again later.');
+    }
+});
+
 </script>
 
 </body>
